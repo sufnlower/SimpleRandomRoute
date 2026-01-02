@@ -1,0 +1,135 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+
+<centre><h1>Simple random route</h1></centre>
+<p>Allow the location and it will generate a random route.</p>
+<input id="distanceInput" type="text" value="5" style="width: 35px;" /><label> KMs</label>
+
+<script>
+    async function everything(){
+    var center = {
+        lat: 5,
+        lon: 5
+    };
+
+    function getPosition() {
+        return new Promise((resolve, reject) => {
+        if (!("geolocation" in navigator)) {
+            reject(new Error("Geolocation not supported"));
+        }
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+    }
+
+    const position = await getPosition();
+
+    center.lat = position.coords.latitude;
+    center.lon = position.coords.longitude;
+
+    function getAPoint(lat, lon, bearing, reqDistance) {
+        console.log("centre inside of getAPoint is")
+        console.log(lat)
+        console.log(lon)
+
+        if (bearing == "North") {
+            latMax = lat + 0.008 / 5000 * reqDistance * 1000
+            latMin = lat + 0.005 / 5000 * reqDistance * 1000
+
+            lonMax = lon + 0.004 / 5000 * reqDistance * 1000
+            lonMin = lon + 0.002 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "NorthWest") {
+            latMax = lat + 0.005 / 5000 * reqDistance * 1000
+            latMin = lat + 0.004 / 5000 * reqDistance * 1000
+
+            lonMax = lon - 0.004 / 5000 * reqDistance * 1000
+            lonMin = lon - 0.005 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "NorthEast") {
+            latMax = lat + 0.005 / 5000 * reqDistance * 1000
+            latMin = lat + 0.004 / 5000 * reqDistance * 1000
+
+            lonMax = lon + 0.005 / 5000 * reqDistance * 1000
+            lonMin = lon + 0.004 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "West") {
+            latMax = lat + 0.006 / 5000 * reqDistance * 1000
+            latMin = lat + 0.005 / 5000 * reqDistance * 1000
+
+            lonMax = lon - 0.003 / 5000 * reqDistance * 1000
+            lonMin = lon - 0.008 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "East") {
+            latMax = lat + 0.004 / 5000 * reqDistance * 1000
+            latMin = lat + 0.003 / 5000 * reqDistance * 1000
+
+            lonMax = lon + 0.008 / 5000 * reqDistance * 1000
+            lonMin = lon + 0.005 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "South") {
+            latMax = lat - 0.005 / 5000 * reqDistance * 1000
+            latMin = lat - 0.008 / 5000 * reqDistance * 1000
+
+            lonMax = lon + 0.004 / 5000 * reqDistance * 1000
+            lonMin = lon + 0.003 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "SouthWest") {
+            latMax = lat - 0.004 / 5000 * reqDistance * 1000
+            latMin = lat - 0.005 / 5000 * reqDistance * 1000
+
+            lonMax = lon - 0.004 / 5000 * reqDistance * 1000
+            lonMin = lon - 0.005 / 5000 * reqDistance * 1000
+        }
+        else if (bearing == "SouthEast") {
+            latMax = lat - 0.004 / 5000 * reqDistance * 1000
+            latMin = lat - 0.005 / 5000 * reqDistance * 1000
+
+            lonMax = lon + 0.005 / 5000 * reqDistance * 1000
+            lonMin = lon + 0.004 / 5000 * reqDistance * 1000
+        }
+
+        lat = Math.random() * (latMax - latMin) + latMin;
+        lon = Math.random() * (lonMax - lonMin) + lonMin;
+        console.log(lat + " " + lon + " " + bearing)
+        return { lat, lon }
+    }
+
+     headings = ["East", "North", "West", "South", "NorthEast", "NorthWest", "SouthEast", "SouthWest"];
+         heading1 = headings[Math.floor(Math.random() * 8)]
+         heading2 = headings[Math.floor(Math.random() * 8)]
+         heading3 = headings[Math.floor(Math.random() * 8)]
+    
+    const reqDistance = document.getElementById("distanceInput").value;
+
+
+    
+    result = getAPoint(center.lat, center.lon, heading1, reqDistance)
+    lat1 = result.lat
+    lon1 = result.lon
+    result = getAPoint(center.lat, center.lon, heading2, reqDistance)
+    lat2 = result.lat
+    lon2 = result.lon
+    result = getAPoint(center.lat, center.lon, heading3, reqDistance)
+    lat3 = result.lat
+    lon3 = result.lon
+
+    createLink(center.lat,center.lon,lat1,lon1,lat2,lon2,lat3,lon3)
+
+    function createLink(centerlat, centerlon, lat1, lon1, lat2, lon2, lat3, lon3) {
+        let url = "https://www.google.com/maps/dir/?api=1&origin=" + centerlat + "," + centerlon + "&destination=" + centerlat + "," + centerlon + "&travelmode=walking&waypoints=" + lat1 + "," + lon1 + "|" + lat2 + "," + lon2 + "|" + lat3 + "," + lon3
+        document.getElementById("googlelink").href = url;
+        document.getElementById("googlelink").innerText = "Open Google map";
+    }
+    }
+    </script>
+
+
+<button onclick="everything()">Generate random route</button>
+<a id="googlelink"></a>
